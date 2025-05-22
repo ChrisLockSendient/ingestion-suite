@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Processing Documents...{% endblock %}
+
+{% block content %}
+<div id="ingesting-page"
+     data-job-id="{{ job_id }}"
+     data-assignment-units="{{ job_info.assignment_units }}"
+     data-mark-scheme-units="{{ job_info.mark_scheme_units }}">
+
+    <h1>Processing Your Documents</h1>
+    <p>Job ID: {{ job_id }}</p>
+    <p id="overall-status" class="status-message">Starting...</p>
+
+    <div class="progress-section">
+        <h3>Assignment Ingestion</h3>
+        <div class="progress-bar-label" id="assignment-progress-label">Progress:</div>
+        <div class="progress-bar">
+            <span id="assignment-progress-fill" class="progress-bar-fill" style="width: 0%;">0%</span>
+        </div>
+        <p id="assignment-ingestion-status" class="status-detail">Status: {{ job_info.assignment_status | default('pending') }}</p>
+    </div>
+
+    <div class="progress-section">
+        <h3>Mark Scheme Ingestion</h3>
+        <div class="progress-bar-label" id="mark-scheme-progress-label">Progress:</div>
+        <div class="progress-bar">
+            <span id="mark-scheme-progress-fill" class="progress-bar-fill" style="width: 0%;">0%</span>
+        </div>
+        <p id="mark-scheme-ingestion-status" class="status-detail">Status: {{ job_info.mark_scheme_status | default('pending') }}</p>
+    </div>
+
+     <div class="progress-section">
+        <h3>Matching Process</h3>
+        <p id="matching-status" class="status-detail">Status: {{ job_info.matching_status | default('pending') }}</p>
+    </div>
+
+    <p class="note">Please keep this page open. You will be redirected when processing is complete.</p>
+    <p class="note">Estimated assignment units: {{ job_info.assignment_units }}. Estimated mark scheme units: {{ job_info.mark_scheme_units }}.</p>
+</div>
+{% endblock %}

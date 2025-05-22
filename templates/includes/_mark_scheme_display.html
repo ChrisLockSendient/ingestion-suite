@@ -1,0 +1,123 @@
+{% macro render_mark_scheme(ms_data, match_score, question_id_ref) %}
+<div class="mark-scheme-display type-{{ ms_data.type | lower }}">
+    <h5>Matched Mark Scheme for Q.{{ question_id_ref }} (Score: {{ "%.2f" | format(match_score) if match_score is not none else 'N/A' }})</h5>
+
+    <div class="ms-header">
+        <p><strong>MS Question Number:</strong> {{ ms_data.question_number | default('N/A') }}</p>
+        <p><strong>MS Type:</strong> {{ ms_data.type | default('N/A') | title }}</p>
+        {% if ms_data.question_text %}
+            <p><strong>MS Question Text (if any):</strong> {{ ms_data.question_text | safe }}</p>
+        {% endif %}
+        <p><strong>MS Marks Available:</strong> {{ ms_data.marks_available if ms_data.marks_available is not none else 'N/A' }}</p>
+    </div>
+
+    <div class="ms-body">
+        <h4>Mark Scheme Details:</h4>
+        {% set scheme_content = ms_data.mark_scheme %} {# This is the actual structured content #}
+
+        {% if ms_data.type == 'generic' and scheme_content %}
+            <p><strong>Total Marks (from MS):</strong> {{ scheme_content.total_marks_available if scheme_content.total_marks_available is not none else 'N/A' }}</p>
+            {% if scheme_content.criteria %}
+                {% for criterion in scheme_content.criteria %}
+                <div class="mark-scheme-criterion">
+                    <p><strong>Criterion:</strong> {{ criterion.mark_scheme_criterion | safe }}</p>
+                    <p><strong>Marks:</strong> {{ criterion.marks_available }} | <strong>Difficulty:</strong> {{ criterion.marking_difficulty }}</p>
+                    {% if criterion.key_points %}
+                    <strong>Key Points:</strong>
+                    <ul class="key-points-list">
+                        {% for point in criterion.key_points %}
+                        <li>{{ point | safe }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No criteria defined for this generic mark scheme.</p>
+            {% endif %}
+            {% if scheme_content.equivalents_or_follow_through_allowed is not none %}
+                <p><strong>Equivalents/Follow-through:</strong> {{ "Allowed" if scheme_content.equivalents_or_follow_through_allowed else "Not Allowed" }}</p>
+            {% endif %}
+
+        {% elif ms_data.type == 'levelled' and scheme_content %}
+            {# scheme_content here is an ObjectiveMarkSchemeModel #}
+            {# The model has 'mark_scheme' (list of levels), 'objective', 'guidance', 'indicative_content', 'weight' #}
+            <div class="objective-scheme">
+                <p><strong>Objective:</strong> {{ scheme_content.objective | default('N/A') }}
+                   (Weight: {{ "%.2f" | format(scheme_content.weight) if scheme_content.weight is not none else 'N/A' }})</p>
+
+                {% if scheme_content.guidance %}
+                    <div class="ms-guidance"><strong>Guidance:</strong> <pre>{{ scheme_content.guidance | safe }}</pre></div>
+                {% endif %}
+                {% if scheme_content.indicative_content %}
+                    <div class="ms-indicative-content"><strong>Indicative Content:</strong> <pre>{{ scheme_content.indicative_content | safe }}</pre></div>
+                {% endif %}
+
+                {% if scheme_content.mark_scheme %} {# This is the list of LeveledMarkSchemeModel #}
+                    {% for level in scheme_content.mark_scheme %}
+                    <div class="level-descriptor">
+                        <p><strong>Level {{ level.level }}:</strong> (Marks: {{ level.lower_mark_bound }} - {{ level.upper_mark_bound }})</p>
+                        <strong>Skills Descriptors:</strong>
+                        <ul>
+                            {% for desc in level.skills_descriptors %}
+                            <li>{{ desc | safe }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% if level.indicative_standard %}
+                            <p><strong>Indicative Standard:</strong></p> <pre>{{ level.indicative_standard | safe }}</pre>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No levels defined for this objective.</p>
+                {% endif %}
+            </div>
+
+        {% elif ms_data.type == 'rubric' and scheme_content %}
+            {# scheme_content here is a RubricMarkSchemeModel, which has a 'rubric' key (list of ObjectiveMarkSchemeModel) #}
+            {% if scheme_content.rubric %}
+                {% for objective_detail in scheme_content.rubric %} {# Iterate through each objective in the rubric #}
+                <div class="objective-scheme">
+                     <h4>Objective: {{ objective_detail.objective | default('N/A') }}
+                        (Weight: {{ "%.2f" | format(objective_detail.weight) if objective_detail.weight is not none else 'N/A' }})</h4>
+
+                     {% if objective_detail.guidance %}
+                        <div class="ms-guidance"><strong>Guidance:</strong> <pre>{{ objective_detail.guidance | safe }}</pre></div>
+                     {% endif %}
+                     {% if objective_detail.indicative_content %}
+                        <div class="ms-indicative-content"><strong>Indicative Content:</strong> <pre>{{ objective_detail.indicative_content | safe }}</pre></div>
+                     {% endif %}
+
+                    {% if objective_detail.mark_scheme %} {# This is the list of LeveledMarkSchemeModel for this objective #}
+                        {% for level in objective_detail.mark_scheme %}
+                        <div class="level-descriptor">
+                            <p><strong>Level {{ level.level }}:</strong> (Marks: {{ level.lower_mark_bound }} - {{ level.upper_mark_bound }})</p>
+                            <strong>Skills Descriptors:</strong>
+                            <ul>
+                                {% for desc in level.skills_descriptors %}
+                                <li>{{ desc | safe }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% if level.indicative_standard %}
+                                <p><strong>Indicative Standard:</strong></p> <pre>{{ level.indicative_standard | safe }}</pre>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No levels defined for objective '{{ objective_detail.objective }}'.</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No objectives defined in this rubric mark scheme.</p>
+            {% endif %}
+        {% else %}
+            <p>Mark scheme details not available or type '{{ ms_data.type }}' not fully supported for detailed display.</p>
+            <p>Raw Mark Scheme Information (from initial extraction):</p>
+            <pre class="raw-ms-info">{{ ms_data.mark_scheme_information | default('N/A') | safe }}</pre>
+            <!-- <p>Full Processed MS Data (for debugging):</p>
+            <pre>{{ scheme_content | tojson(indent=2) }}</pre> -->
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "includes/_question_card.html" import render_question with context %}
+{# The _mark_scheme_display.html is now called from within _question_card.html #}
+
+{% block title %}View Assessment - Job {{ job_id }}{% endblock %}
+
+{% block content %}
+<h1>Assessment Details</h1>
+<p>Displaying ingested data for Job ID: <strong>{{ job_id }}</strong></p>
+
+{% if assessment and assessment.questions %}
+    {% for question_item in assessment.questions %}
+        {# Pass the question item and common_components to the macro #}
+        {{ render_question(question_item, common_components) }}
+    {% endfor %}
+{% elif assessment %}
+    <p class="status-message error">No questions found in the processed assessment data. The assessment might be empty or there was an issue during ingestion.</p>
+    <pre><code>{{ assessment | tojson(indent=2) }}</code></pre>
+{% else %}
+    <p class="status-message error">Assessment data is not available for this job.</p>
+{% endif %}
+
+<div style="margin-top: 30px; text-align: center;">
+    <a href="{{ url_for('index') }}" class="button-link">Upload Another Assessment</a>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Assessments{% endblock %}
+
+{% block content %}
+<h1>Upload Assessment and Mark Scheme</h1>
+<p>Upload your assignment and mark scheme documents below. You can upload either a single PDF file or multiple image files for each document type.</p>
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="upload-section">
+        <h2>Assignment Document</h2>
+        <div class="upload-type-selector">
+            <label>
+                <input type="radio" name="assignment_upload_type" id="assignment_type_pdf" value="pdf" checked> Upload PDF
+            </label>
+            <label>
+                <input type="radio" name="assignment_upload_type" id="assignment_type_images" value="images"> Upload Images
+            </label>
+        </div>
+
+        <div id="assignment_pdf_upload" class="file-input-group">
+            <label for="assignment_pdf">Select Assignment PDF:</label>
+            <input type="file" name="assignment_pdf" id="assignment_pdf" accept=".pdf">
+        </div>
+        <div id="assignment_images_upload" class="file-input-group" style="display:none;">
+            <label for="assignment_images">Select Assignment Images (PNG, JPG, JPEG):</label>
+            <input type="file" name="assignment_images" id="assignment_images" accept="image/png, image/jpeg, image/jpg" multiple>
+        </div>
+    </div>
+
+    <div class="upload-section">
+        <h2>Mark Scheme Document</h2>
+        <div class="upload-type-selector">
+            <label>
+                <input type="radio" name="mark_scheme_upload_type" id="mark_scheme_type_pdf" value="pdf" checked> Upload PDF
+            </label>
+            <label>
+                <input type="radio" name="mark_scheme_upload_type" id="mark_scheme_type_images" value="images"> Upload Images
+            </label>
+        </div>
+
+        <div id="mark_scheme_pdf_upload" class="file-input-group">
+            <label for="mark_scheme_pdf">Select Mark Scheme PDF:</label>
+            <input type="file" name="mark_scheme_pdf" id="mark_scheme_pdf" accept=".pdf">
+        </div>
+        <div id="mark_scheme_images_upload" class="file-input-group" style="display:none;">
+            <label for="mark_scheme_images">Select Mark Scheme Images (PNG, JPG, JPEG):</label>
+            <input type="file" name="mark_scheme_images" id="mark_scheme_images" accept="image/png, image/jpeg, image/jpg" multiple>
+        </div>
+    </div>
+
+    <div class="submit-button-container">
+        <input type="submit" value="Upload and Process Documents">
+    </div>
+</form>
+{% endblock %}

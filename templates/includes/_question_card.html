@@ -1,0 +1,101 @@
+{% from "includes/_mark_scheme_display.html" import render_mark_scheme with context %}
+
+{% macro render_question(question_item, common_components_map) %}
+<div class="question-card">
+    <h3>Question ID: {{ question_item.question_id }}</h3>
+    <div class="question-details">
+        <p><strong>Question Text:</strong></p>
+        <div class="question-text-content">{{ question_item.question | default('N/A') | safe }}</div>
+
+        <p><strong>Type:</strong> {{ question_item.question_type | default('N/A') }}</p>
+        <p><strong>Marks Available (from Assessment):</strong> {{ question_item.total_marks_available if question_item.total_marks_available is not none else 'N/A' }}</p>
+        <p><strong>Needs Marking:</strong> {{ 'Yes' if question_item.needs_marking else 'No' }}</p>
+        <p><strong>Likely Answer Component Type:</strong> {{ question_item.likely_answer_component_type | default('N/A') }}</p>
+
+        {% if question_item.parent_question_id %}
+            <p><strong>Parent Question ID:</strong> {{ question_item.parent_question_id }}</p>
+        {% endif %}
+        {% if question_item.question_number %}
+            <p><strong>Question Number (within parent):</strong> {{ question_item.question_number }}</p>
+        {% endif %}
+        {% if question_item.question_dependencies %}
+            <p><strong>Dependencies:</strong> {{ question_item.question_dependencies | join(', ') if question_item.question_dependencies else 'None' }}</p>
+        {% endif %}
+    </div>
+
+    {% if question_item.possible_answers %}
+    <div class="possible-answers-section">
+        <h4>Possible Answers (Multiple Choice):</h4>
+        <ul>
+            {% for ans in question_item.possible_answers %}
+            <li>{{ ans | safe }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if question_item.question_context %}
+    <div class="context-section">
+        <h4>Question Context (from Assessment):</h4>
+        {% for ctx_wrapper in question_item.question_context %}
+            {% set component_ref_id = ctx_wrapper.component.reference %}
+            {% set actual_component_data = common_components_map.get(component_ref_id) %}
+
+            <div class="component-wrapper">
+                <p><em>Context Reference ID: {{ component_ref_id }} (Type in assessment: {{ ctx_wrapper.component_type }})</em></p>
+                {% if actual_component_data %}
+                    <div class="component component-type-{{ actual_component_data.component_type | lower }}">
+                        <strong>Stored Common Component (ID: {{ component_ref_id }}, Type: {{ actual_component_data.component_type | title }})</strong>
+
+                        {% if actual_component_data.component_type in ['text', 'table', 'equation'] %}
+                            {% if actual_component_data.component and actual_component_data.component.data %}
+                                <pre class="component-data">{{ actual_component_data.component.data | safe }}</pre>
+                            {% elif actual_component_data.data %} {# Older structure? #}
+                                <pre class="component-data">{{ actual_component_data.data | safe }}</pre>
+                            {% else %}
+                                <p class="component-data-missing">Text/Table/Equation data missing or in unexpected format.</p>
+                                <pre>{{ actual_component_data | tojson(indent=2) }}</pre>
+                            {% endif %}
+                        {% elif actual_component_data.component_type in ['image', 'chart'] %}
+                            <p><em>Visual component: {{ actual_component_data.component_type | title }} (ID: {{ component_ref_id }})</em></p>
+                            {% if actual_component_data.base64 %}
+                                 <img src="data:image/{{ actual_component_data.extension | default('png') }};base64,{{ actual_component_data.base64 }}"
+                                      alt="{{ actual_component_data.component_type }} {{ component_ref_id }}"
+                                      class="context-image">
+                            {% elif actual_component_data.component and actual_component_data.component.reference %}
+                                 {# This case might be if the common component itself is a reference, which seems unlikely for base64 storage #}
+                                 <p>Reference to: {{ actual_component_data.component.reference }} (Further dereferencing might be needed)</p>
+                            {% else %}
+                                 <p class="component-data-missing">Image/Chart data (base64) missing.</p>
+                                 <pre>{{ actual_component_data | tojson(indent=2) }}</pre>
+                            {% endif %}
+                        {% else %}
+                            <p>Unknown common component type: {{ actual_component_data.component_type }}</p>
+                            <pre>{{ actual_component_data | tojson(indent=2) }}</pre>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p class="component-missing"><em>Common component with ID '{{ component_ref_id }}' not found.</em></p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# --- Matched Mark Scheme Display --- #}
+    {% if question_item.matched_mark_scheme %}
+        {{ render_mark_scheme(question_item.matched_mark_scheme, question_item.match_score, question_item.question_id) }}
+    {% elif question_item.match_score is not none %}
+         <div class="mark-scheme-display no-match">
+            <h5>Mark Scheme Information</h5>
+            <p>No mark scheme matched above threshold. Best score for Q.{{ question_item.question_id }}: {{ "%.2f" | format(question_item.match_score) }}</p>
+            {% if question_item.match_note %} <p>Note: {{ question_item.match_note }}</p> {% endif %}
+        </div>
+    {% else %}
+        <div class="mark-scheme-display unavailable">
+            <h5>Mark Scheme Information</h5>
+            <p>No mark scheme information available or matching not performed for Q.{{ question_item.question_id }}.</p>
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}
