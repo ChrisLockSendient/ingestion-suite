@@ -52,7 +52,7 @@ def extract_generic_mark_scheme(mark_scheme_raw: ExtractedMarkSchemeInformation)
     try:
         response_str = invoke_openai(
             prompt=prompt,
-            model_name=os.getenv("MARK_SCHEME_LLM_MODEL", "gpt-4.1"),
+            model_name="gpt-4.1",
             output_format=MarkSchemeBaseModel, # Pass the Pydantic model class
             payload=[user_message]
         )
@@ -86,7 +86,7 @@ def extract_levelled_mark_scheme(mark_scheme_raw: ExtractedMarkSchemeInformation
     try:
         response_str = invoke_openai(
             prompt=prompt,
-            model_name=os.getenv("MARK_SCHEME_LLM_MODEL", "gpt-4.1"),
+            model_name="gpt-4.1",
             output_format=ObjectiveMarkSchemeModel, # Pass Pydantic model
             payload=[user_message]
         )
@@ -119,7 +119,7 @@ def extract_rubric_mark_scheme(mark_scheme_raw: ExtractedMarkSchemeInformation) 
     try:
         response_str = invoke_openai(
             prompt=prompt,
-            model_name=os.getenv("MARK_SCHEME_LLM_MODEL", "gpt-4.1"),
+            model_name="gpt-4.1",
             output_format=RubricMarkSchemeModel, # Pass Pydantic model
             payload=[user_message]
         )
@@ -241,7 +241,7 @@ def ingest_mark_scheme(
     raw_extracted_ms_list: List[ExtractedMarkSchemeInformation] = extract_mark_scheme_information_from_images_openai(
         images=image_paths_for_extraction,
         prompt=prompt_for_initial_extraction,
-        model_name=os.getenv("MARK_SCHEME_IMAGE_LLM_MODEL", "gpt-4.1") # Configurable model
+        model_name="gpt-4.1" # Configurable model
     )
 
     if not raw_extracted_ms_list:

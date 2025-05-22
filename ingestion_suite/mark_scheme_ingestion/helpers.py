@@ -41,11 +41,18 @@ def fetch_test_file_path(*path_parts: str, index: int = 0) -> Path:
 
 def get_llm(model_name: str) -> Optional[ChatCompletionsClient]:
     """Return an AzureChatOpenAI instance (or None on config error)."""
+    endpoint = os.getenv("AZURE_OPENAI_ENDPOINT_4_1")
+    key = os.getenv("AZURE_OPENAI_API_KEY")
+    version = os.getenv("AZURE_OPENAI_VERSION_4_1")
+
+    print(endpoint)
+    print(key)
+    print(version)
 
     client = ChatCompletionsClient(
-        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT_4_1"),
-        credential=AzureKeyCredential(os.getenv("AZURE_OPENAI_API_KEY")),
-        api_version=os.getenv("AZURE_OPENAI_VERSION_4_1"),
+        endpoint=endpoint,
+        credential=AzureKeyCredential(key),
+        api_version=version,
     )
 
     try:

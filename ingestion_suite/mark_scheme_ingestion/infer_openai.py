@@ -33,13 +33,13 @@ def invoke_openai(
 
     return response.choices[0].message.content
 
-if __name__ == "__main__":
-    image_path = "June 2020 MS_images\\page_6.png"
-    data_url = load_image_as_data_url(image_path)
+# if __name__ == "__main__":
+#     image_path = "June 2020 MS_images\\page_6.png"
+#     data_url = load_image_as_data_url(image_path)
 
-    response = invoke_openai(
-        image=data_url,
-        prompt="Describe whats in this image",
-        model_name="gpt-4.1"
-    )
-    print(response)
+#     response = invoke_openai(
+#         image=data_url,
+#         prompt="Describe whats in this image",
+#         model_name="gpt-4.1"
+#     )
+#     print(response)

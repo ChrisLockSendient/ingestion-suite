@@ -30,32 +30,32 @@ def extract_tables_from_images_and_save_openai(images: List[Path], prompt: str, 
         file.write(json.dumps(all_mark_schemes, indent=4))
     return all_mark_schemes
 
-if __name__ == "__main__":
-    qualification_level = "GCSE"
-    exam_board = "AQA"
-    subject = "Chemistry"
-    index = 0
+# if __name__ == "__main__":
+#     qualification_level = "GCSE"
+#     exam_board = "AQA"
+#     subject = "Chemistry"
+#     index = 0
 
-    pdf = fetch_test_file_path(qualification_level, exam_board, subject, index=index)
-    images = pdf_to_images(pdf)
+#     pdf = fetch_test_file_path(qualification_level, exam_board, subject, index=index)
+#     images = pdf_to_images(pdf)
 
-    # images = [Path("test_data/Rubrics/rubric1.jpg")]
+#     # images = [Path("test_data/Rubrics/rubric1.jpg")]
 
-    prompt = extract_mark_schemes_from_image_and_classify_prompt.format(
-        example_output_1=json.dumps(extract_mark_schemes_from_image_and_classify_example_output_1, indent=4),
-        example_output_2=json.dumps(extract_mark_schemes_from_image_and_classify_example_output_2, indent=4)
-    )
+#     prompt = extract_mark_schemes_from_image_and_classify_prompt.format(
+#         example_output_1=json.dumps(extract_mark_schemes_from_image_and_classify_example_output_1, indent=4),
+#         example_output_2=json.dumps(extract_mark_schemes_from_image_and_classify_example_output_2, indent=4)
+#     )
 
-    from datetime import datetime
+#     from datetime import datetime
 
-    current_time_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_file_name = f"{qualification_level}_{exam_board}_{subject}_{index}_extracted_json_openai_{current_time_str}"
-    extracted_markscheme_table_openai = extract_mark_scheme_information_from_images_openai(
-        images,
-        prompt,
-        model_name="gpt-4.1",
-        output_file_name=output_file_name
-    )
+#     current_time_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+#     output_file_name = f"{qualification_level}_{exam_board}_{subject}_{index}_extracted_json_openai_{current_time_str}"
+#     extracted_markscheme_table_openai = extract_mark_scheme_information_from_images_openai(
+#         images,
+#         prompt,
+#         model_name="gpt-4.1",
+#         output_file_name=output_file_name
+#     )
 
     # Route and extract mark schemes by type
     # extraction_results = route_and_extract_mark_schemes(extracted_markscheme_table_openai)
