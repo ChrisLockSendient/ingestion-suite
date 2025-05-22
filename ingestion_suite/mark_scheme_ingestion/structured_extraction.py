@@ -1,12 +1,12 @@
 import json
-from infer_openai import invoke_openai
-from helpers import pdf_to_images, fetch_test_file_path, load_image_as_data_url, collapse_entries
+from .infer_openai import invoke_openai
+from .helpers import pdf_to_images, fetch_test_file_path, load_image_as_data_url, collapse_entries
 from typing import List
 from pathlib import Path
 from azure.ai.inference.models import ImageContentItem, ImageUrl, UserMessage
-from prompt_lib import extract_mark_schemes_from_image_and_classify_prompt
-from output import ExtractedMarkSchemesInformationWrapper
-from few_shot_examples import extract_mark_schemes_from_image_and_classify_example_output_1, extract_mark_schemes_from_image_and_classify_example_output_2
+from .prompt_lib import extract_mark_schemes_from_image_and_classify_prompt
+from .output import ExtractedMarkSchemesInformationWrapper
+from .few_shot_examples import extract_mark_schemes_from_image_and_classify_example_output_1, extract_mark_schemes_from_image_and_classify_example_output_2
 
 def extract_mark_scheme_information_from_images_openai(images: List[Path], prompt: str, model_name: str) -> ExtractedMarkSchemesInformationWrapper:
     all_mark_schemes = []

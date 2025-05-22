@@ -1,2 +1,4 @@
 /ingestion_suite_venv
 .env
+ingested_data/
+uploads/

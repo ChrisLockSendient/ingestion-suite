@@ -39,51 +39,13 @@ def fetch_test_file_path(*path_parts: str, index: int = 0) -> Path:
 
     return Path(str(pdfs[idx]).replace('\\', '/'))
 
-
-# AZURE configuration dictionary, loaded from environment variables
-AZURE = {
-    "gpt-4.1-nano": {
-        "endpoint": os.getenv("AZURE_OPENAI_ENDPOINT_4_1_NANO"),
-        "version": os.getenv("AZURE_OPENAI_VERSION_4_1_NANO"),
-        "deployment": os.getenv("AZURE_OPENAI_DEPLOYMENT_4_1_NANO"),
-    },
-    "gpt-4.1": {
-        "endpoint": os.getenv("AZURE_OPENAI_ENDPOINT_4_1"),
-        "version": os.getenv("AZURE_OPENAI_VERSION_4_1"),
-        "deployment": os.getenv("AZURE_OPENAI_DEPLOYMENT_4_1"),
-    },
-    "gpt-4o": {
-        "endpoint": os.getenv("AZURE_OPENAI_ENDPOINT"), # Assuming default is gpt-4o
-        "version": os.getenv("AZURE_OPENAI_VERSION"),
-        "deployment": os.getenv("AZURE_OPENAI_DEPLOYMENT"),
-    },
-    "o3-mini": {
-        "endpoint": os.getenv("AZURE_OPENAI_ENDPOINT_O3"),
-        "version": os.getenv("AZURE_OPENAI_VERSION_O3"),
-        "deployment": os.getenv("AZURE_OPENAI_DEPLOYMENT_O3"),
-    },
-    "o4-mini": {
-        "endpoint": os.getenv("AZURE_OPENAI_ENDPOINT_O4"),
-        "version": os.getenv("AZURE_OPENAI_VERSION_O4"),
-        "deployment": os.getenv("AZURE_OPENAI_DEPLOYMENT_O4"),
-    },
-    "key": os.getenv("AZURE_OPENAI_API_KEY"),
-}
-
 def get_llm(model_name: str) -> Optional[ChatCompletionsClient]:
     """Return an AzureChatOpenAI instance (or None on config error)."""
-    conf = AZURE.get(model_name, {})
-    if not conf or not AZURE["key"]:
-        logger.error("Azure OpenAI credentials missing")
-        return None
-
-    print(conf["endpoint"])
-    print(AZURE["key"])
 
     client = ChatCompletionsClient(
-        endpoint=conf["endpoint"],
-        credential=AzureKeyCredential(AZURE["key"]),
-        api_version=conf["version"],
+        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT_4_1"),
+        credential=AzureKeyCredential(os.getenv("AZURE_OPENAI_API_KEY")),
+        api_version=os.getenv("AZURE_OPENAI_VERSION_4_1"),
     )
 
     try:

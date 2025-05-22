@@ -9,7 +9,7 @@ from azure.ai.inference.models import (
 from typing import List
 
 from pydantic import BaseModel
-from helpers import get_llm, load_image_as_data_url
+from .helpers import get_llm, load_image_as_data_url
 
 def invoke_openai(
     prompt: str,
